@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  background: linear-gradient(135deg, #0f172a, #312e81, #4c1d95);
+  color: #1e293b;
+  padding: 30px;
+}
+
+.dashboard {
+  max-width: 900px;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.96);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.admin-name {
+  color: #64748b;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.logout,
+.past-link {
+  color: #4f46e5;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.top-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 10px;
+  text-align: left;
+}
+
+th {
+  color: #475569;
+  font-size: 13px;
+}
+
+td {
+  font-size: 15px;
+}
+
+.open-btn,
+.delete-btn {
+  border: 0;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 9px 12px;
+}
+
+.open-btn {
+  background: #4f46e5;
+}
+
+.delete-btn {
+  background: #dc2626;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.empty {
+  text-align: center;
+  color: #64748b;
+  padding: 25px 0;
+}
+</style>
+</head>
+<body>
+<main class="dashboard">
+  <div class="topbar">
+    <div>
+      <h1>Admin Dashboard</h1>
+      <div class="admin-name">Logged in as {{ admin }}</div>
+    </div>
+    <div class="top-actions">
+      <a class="past-link" href="/admin/past-users">Past Users</a>
+      <a class="logout" href="/admin/logout">Logout</a>
+    </div>
+  </div>
+
+  {% if users %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user[0] }}</td>
+        <td>{{ user[1] }}</td>
+        <td>{{ user[2] }}</td>
+        <td class="actions">
+          <form method="POST" action="/admin/login-as/{{ user[1] }}">
+            <button class="open-btn" type="submit">Login as user</button>
+          </form>
+          <form method="POST" action="/admin/delete-user/{{ user[0] }}" onsubmit="return confirm('Delete this user and archive their data?')">
+            <button class="delete-btn" type="submit">Delete user</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">No users found.</div>
+  {% endif %}
+</main>
+</body>
+</html>

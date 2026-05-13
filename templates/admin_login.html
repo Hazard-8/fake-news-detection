@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(-45deg, #667eea, #764ba2, #6dd5ed, #2193b0);
+  background-size: 400% 400%;
+  animation: gradientBG 10s ease infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.login-container {
+  background: rgba(255,255,255,0.95);
+  padding: 40px;
+  border-radius: 12px;
+  width: 320px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+input[type="submit"] {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  font-size: 13px;
+  margin: 8px 0;
+}
+
+.links {
+  text-align: center;
+  margin-top: 10px;
+}
+</style>
+</head>
+<body>
+<div class="login-container">
+  <h2>Admin Login</h2>
+  <form method="POST" action="/admin/login">
+    <input type="text" name="username" placeholder="Admin username" required>
+    <input type="password" name="password" placeholder="Admin password" required>
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+    <input type="submit" value="Login">
+  </form>
+  <div class="links">
+    <a href="/login">User Login</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Detection System</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/static/style.css">
+
+
+</head>
+
+<body>
+
+{% set profile_name = username if username else session.get('user', 'User') %}
+<div class="profile-menu" id="profileMenu">
+    <button class="profile-toggle" id="profileToggle" type="button" aria-label="Open profile menu" aria-expanded="false">
+        <span>{{ profile_name[:1]|upper }}</span>
+    </button>
+
+    <div class="profile-popup" id="profilePopup">
+        <div class="profile-info">
+            <div class="profile-avatar">{{ profile_name[:1]|upper }}</div>
+            <div>
+                <strong>{{ profile_name }}</strong>
+                <small>Signed in</small>
+            </div>
+        </div>
+
+        <a class="profile-logout" href="/logout">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12H3m0 0l4-4m-4 4l4 4M21 4v16a2 2 0 01-2 2h-7a2 2 0 01-2-2v-3m0-10V4a2 2 0 012-2h7a2 2 0 012 2z"></path>
+            </svg>
+            Logout
+        </a>
+
+        <a class="profile-logout" href="/register">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M8.5 11a4 4 0 100-8 4 4 0 000 8M20 8v6M17 11h6"></path>
+            </svg>
+            Create new account
+        </a>
+
+        <button class="profile-logout profile-delete-btn" id="deleteAccountBtn" type="button">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 11v6M14 11v6"></path>
+            </svg>
+            Delete account
+        </button>
+    </div>
+</div>
+
+<aside class="app-sidebar" id="appSidebar">
+    <nav class="sidebar-rail" aria-label="Analyzer shortcuts">
+        <button class="rail-button" id="sidebarToggle" type="button" aria-label="Open sidebar">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2M7 16h6M7 8h6v4H7V8z"></path>
+            </svg>
+            <span class="rail-tip">Open sidebar</span>
+        </button>
+
+        <a class="rail-button" href="/" aria-label="New tab">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14"></path>
+            </svg>
+            <span class="rail-tip">New tab</span>
+        </a>
+
+        <button class="rail-button" id="historyToggle" type="button" aria-label="Analyser history">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v5l3 2"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.1 12a9 9 0 102.6-6.4L3 8.2"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4v4h4"></path>
+            </svg>
+            <span class="rail-tip">Analyser history</span>
+        </button>
+    </nav>
+
+    <div class="sidebar-panel">
+        <div class="sidebar-title">
+            <strong>News Analyzer</strong>
+            <span>{{ profile_name }}</span>
+        </div>
+
+        <a class="sidebar-link" href="/">
+            <span>New tab</span>
+            <small>Start a fresh analysis</small>
+        </a>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-head">
+                <div class="sidebar-section-title">Analyser history</div>
+                <button class="clear-history-btn" id="clearHistoryBtn" type="button">Clear All</button>
+            </div>
+            <div class="history-list">
+                {% if history_items %}
+                    {% for item in history_items %}
+                    <div class="history-item" data-news="{{ item.news|e }}">
+                        <button class="history-main" type="button">
+                            <span>{{ item.news[:64] }}{% if item.news|length > 64 %}...{% endif %}</span>
+                            <small>{{ item.result }} | {{ item.confidence }}%</small>
+                        </button>
+
+                        <button class="history-menu-btn" type="button" aria-label="Chat options">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+
+                        <form class="history-delete-menu" method="POST" action="/history/delete/{{ item.id }}">
+                            <button type="submit">Delete chat</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="history-empty">No analyser history yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</aside>
+
+<div class="confirm-modal" id="clearHistoryModal" hidden>
+    <div class="confirm-box">
+        <h3>Clear all chat?</h3>
+        <p>This will delete all analyser history for this account.</p>
+        <div class="confirm-actions">
+            <button class="confirm-cancel" id="cancelClearHistory" type="button">Cancel</button>
+            <form method="POST" action="/history/clear">
+                <button class="confirm-delete" type="submit">Clear all chat</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="confirm-modal" id="deleteAccountModal" hidden>
+    <div class="confirm-box">
+        <h3>Delete account?</h3>
+        <p>Type this text to confirm: <strong id="deletePhraseText">loading</strong></p>
+        {% if account_delete_error %}
+        <p class="confirm-error">{{ account_delete_error }}</p>
+        {% endif %}
+        <form method="POST" action="/account/delete">
+            <input class="confirm-input" id="deletePhraseInput" name="delete_phrase" autocomplete="off" required>
+            <div class="confirm-actions">
+                <button class="confirm-cancel" id="cancelDeleteAccount" type="button">Cancel</button>
+                <button class="confirm-delete" type="submit">Delete account</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<main class="container">
+
+
+<div class="header">
+    <!-- ORIGINAL LOGO -->
+    <svg class="header-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
+        </path>
+    </svg>
+
+    <h1>News Analyzer</h1>
+    <p class="subtitle">Machine Learning Based News Classification</p>
+    <p class="status">🟢 System | ML + Live Verification</p>
+</div>
+
+<form action="/predict" method="post" class="analyze-form">
+    <div class="input-group">
+        <textarea name="news" placeholder="Paste the news article excerpt here for analysis..." required></textarea>
+    </div>
+
+    <button type="submit" class="btn-submit" onclick="showLoader()">
+        <span id="btnText">Analyze News</span>
+        <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+    </button>
+</form>
+
+{% if prediction_text %}
+
+    {% if 'Please enter' in prediction_text %}
+        <!-- ALERT BOX -->
+        <div class="alert-box">
+            <span>⚠️</span>
+            <p>{{ prediction_text }}</p>
+        </div>
+
+    {% else %}
+        <!-- RESULT CARD -->
+        <div class="result-card {% if prediction_text == 'Fake News' %}is-fake{% else %}is-real{% endif %}">
+            <div class="result-header">
+                <h2>{{ prediction_text }}</h2>
+            </div>
+
+            <p class="confidence-label">
+                Confidence Score: <strong>{{ confidence }}%</strong>
+            </p>
+
+            <div class="confidence-bar-container">
+                <div class="confidence-bar" style="width: {{ confidence }}%;"></div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endif %}
+
+{% if articles %}
+<div class="news-card">
+    <h3>📰 Verified News Sources</h3>
+    <ul>
+        {% for article in articles %}
+        <li>
+            <a href="{{ article.url }}" target="_blank">{{ article.title }}</a>
+            <span class="source">{{ article.source }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if search_url %}
+<div class="verify-box">
+    <a href="{{ search_url }}" target="_blank">🔎 Cross-check this news on Google</a>
+</div>
+{% endif %}
+
+
+</main>
+
+<footer>
+    <p>Mini Project | Fake News Detection Using Machine Learning</p>
+</footer>
+
+<script>
+function showLoader() {
+    document.getElementById("btnText").innerText = "Analyzing...";
+}
+</script>
+
+<script>
+const profileMenu = document.getElementById('profileMenu');
+const profileToggle = document.getElementById('profileToggle');
+const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+const deleteAccountModal = document.getElementById('deleteAccountModal');
+const cancelDeleteAccount = document.getElementById('cancelDeleteAccount');
+const deletePhraseText = document.getElementById('deletePhraseText');
+const deletePhraseInput = document.getElementById('deletePhraseInput');
+const hasDeleteError = {{ 'true' if account_delete_error else 'false' }};
+
+profileToggle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const isOpen = profileMenu.classList.toggle('is-open');
+    profileToggle.setAttribute('aria-expanded', isOpen);
+});
+
+document.addEventListener('click', (event) => {
+    if (!profileMenu.contains(event.target)) {
+        profileMenu.classList.remove('is-open');
+        profileToggle.setAttribute('aria-expanded', 'false');
+    }
+});
+
+async function openDeleteAccountModal() {
+    deleteAccountModal.hidden = false;
+    deletePhraseInput.value = '';
+    deletePhraseText.innerText = 'loading';
+
+    try {
+        const response = await fetch('/account/delete-challenge', { cache: 'no-store' });
+        const data = await response.json();
+        deletePhraseText.innerText = data.phrase;
+        deletePhraseInput.focus();
+    } catch {
+        deletePhraseText.innerText = 'try again';
+    }
+}
+
+deleteAccountBtn.addEventListener('click', openDeleteAccountModal);
+
+cancelDeleteAccount.addEventListener('click', () => {
+    deleteAccountModal.hidden = true;
+});
+
+deleteAccountModal.addEventListener('click', (event) => {
+    if (event.target === deleteAccountModal) {
+        deleteAccountModal.hidden = true;
+    }
+});
+
+if (hasDeleteError) {
+    openDeleteAccountModal();
+}
+</script>
+
+<script>
+const appSidebar = document.getElementById('appSidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const historyToggle = document.getElementById('historyToggle');
+const historySection = document.querySelector('.sidebar-section');
+const newsInput = document.querySelector('textarea[name="news"]');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const clearHistoryModal = document.getElementById('clearHistoryModal');
+const cancelClearHistory = document.getElementById('cancelClearHistory');
+
+function openAppSidebar() {
+    appSidebar.classList.add('is-open');
+    sidebarToggle.setAttribute('aria-label', 'Close sidebar');
+}
+
+function closeAppSidebar() {
+    appSidebar.classList.remove('is-open');
+    sidebarToggle.setAttribute('aria-label', 'Open sidebar');
+}
+
+sidebarToggle.addEventListener('click', () => {
+    if (appSidebar.classList.contains('is-open')) {
+        closeAppSidebar();
+    } else {
+        openAppSidebar();
+    }
+});
+
+document.addEventListener('click', (event) => {
+    const clickedSidebarContent = event.target.closest('.sidebar-rail, .sidebar-panel');
+
+    if (
+        appSidebar.classList.contains('is-open') &&
+        !clickedSidebarContent &&
+        !event.target.closest('.confirm-modal')
+    ) {
+        closeAppSidebar();
+    }
+});
+
+historyToggle.addEventListener('click', () => {
+    openAppSidebar();
+    historySection.scrollIntoView({ block: 'nearest' });
+});
+
+document.querySelectorAll('.history-item').forEach((item) => {
+    const mainButton = item.querySelector('.history-main');
+    const menuButton = item.querySelector('.history-menu-btn');
+
+    mainButton.addEventListener('click', () => {
+        if (newsInput) {
+            newsInput.value = item.dataset.news;
+            newsInput.focus();
+        }
+    });
+
+    menuButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        document.querySelectorAll('.history-item.is-menu-open').forEach((openItem) => {
+            if (openItem !== item) {
+                openItem.classList.remove('is-menu-open');
+            }
+        });
+        item.classList.toggle('is-menu-open');
+    });
+});
+
+clearHistoryBtn.addEventListener('click', () => {
+    clearHistoryModal.hidden = false;
+});
+
+cancelClearHistory.addEventListener('click', () => {
+    clearHistoryModal.hidden = true;
+});
+
+clearHistoryModal.addEventListener('click', (event) => {
+    if (event.target === clearHistoryModal) {
+        clearHistoryModal.hidden = true;
+    }
+});
+
+document.addEventListener('click', (event) => {
+    if (!event.target.closest('.history-item')) {
+        document.querySelectorAll('.history-item.is-menu-open').forEach((item) => {
+            item.classList.remove('is-menu-open');
+        });
+    }
+});
+</script>
+
+<script>
+const body = document.querySelector('body');
+
+let targetX = window.innerWidth / 2;
+let targetY = window.innerHeight / 2;
+
+let currentX = targetX;
+let currentY = targetY;
+let softX = targetX;
+let softY = targetY;
+let deepX = targetX;
+let deepY = targetY;
+const fastEase = 0.11;
+const softEase = 0.045;
+const deepEase = 0.022;
+
+document.addEventListener('pointermove', (e) => {
+    targetX = e.clientX;
+    targetY = e.clientY;
+    body.style.setProperty('--fluid-opacity', '0.5');
+});
+
+document.addEventListener('pointerleave', () => {
+    body.style.setProperty('--fluid-opacity', '0.18');
+});
+
+function updateSpotlight() {
+    currentX += (targetX - currentX) * fastEase;
+    currentY += (targetY - currentY) * fastEase;
+    softX += (targetX - softX) * softEase;
+    softY += (targetY - softY) * softEase;
+    deepX += (targetX - deepX) * deepEase;
+    deepY += (targetY - deepY) * deepEase;
+
+    body.style.setProperty('--cursor-x', `${currentX}px`);
+    body.style.setProperty('--cursor-y', `${currentY}px`);
+    body.style.setProperty('--cursor-soft-x', `${softX}px`);
+    body.style.setProperty('--cursor-soft-y', `${softY}px`);
+    body.style.setProperty('--cursor-deep-x', `${deepX}px`);
+    body.style.setProperty('--cursor-deep-y', `${deepY}px`);
+    requestAnimationFrame(updateSpotlight);
+}
+
+updateSpotlight();
+</script>
+
+</body>
+</html>

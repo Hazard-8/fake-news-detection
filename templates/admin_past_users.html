@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Past Users</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  background: linear-gradient(135deg, #0f172a, #312e81, #4c1d95);
+  color: #1e293b;
+  padding: 30px;
+}
+
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.topbar,
+.user-card {
+  background: rgba(255,255,255,0.96);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 26px;
+  margin-bottom: 18px;
+}
+
+h1,
+h2 {
+  margin: 0;
+}
+
+.links a {
+  color: #4f46e5;
+  font-weight: bold;
+  text-decoration: none;
+  margin-left: 14px;
+}
+
+.delete-all {
+  border: 0;
+  border-radius: 8px;
+  background: #dc2626;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 9px 12px;
+  margin-left: 14px;
+}
+
+.user-card {
+  padding: 22px;
+  margin-bottom: 16px;
+}
+
+.user-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.delete-user {
+  border: 0;
+  border-radius: 8px;
+  background: #dc2626;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 9px 12px;
+  white-space: nowrap;
+}
+
+.meta {
+  color: #64748b;
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.credentials {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.credential-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.credential-box span {
+  color: #64748b;
+  display: block;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+th,
+td {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 11px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  color: #475569;
+  font-size: 13px;
+}
+
+.empty {
+  background: rgba(255,255,255,0.96);
+  border-radius: 16px;
+  color: #64748b;
+  padding: 28px;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="topbar">
+    <div>
+      <h1>Past Users</h1>
+      <div class="meta">Logged in as {{ admin }}</div>
+    </div>
+    <div class="links">
+      <a href="/admin/dashboard">Dashboard</a>
+      <a href="/admin/logout">Logout</a>
+      <form method="POST" action="/admin/clear-past-users" style="display:inline;" onsubmit="return confirm('Delete all past users and their data?')">
+        <button class="delete-all" type="submit">Delete All Past Users</button>
+      </form>
+    </div>
+  </div>
+
+  {% if past_users %}
+    {% for item in past_users %}
+    <section class="user-card">
+      <div class="user-head">
+        <div>
+          <h2>{{ item.user[2] }}</h2>
+          <div class="meta">Deleted by {{ item.user[4] }} on {{ item.user[5] }}</div>
+        </div>
+        <form method="POST" action="/admin/delete-past-user/{{ item.user[0] }}" onsubmit="return confirm('Delete this past user and all saved data?')">
+          <button class="delete-user" type="submit">Delete User Data</button>
+        </form>
+      </div>
+
+      <div class="credentials">
+        <div class="credential-box">
+          <span>Past username</span>
+          <strong>{{ item.user[2] }}</strong>
+        </div>
+        <div class="credential-box">
+          <span>Past password</span>
+          <strong>{{ item.user[3] }}</strong>
+        </div>
+      </div>
+
+      {% if item.history %}
+      <table>
+        <thead>
+          <tr>
+            <th>News</th>
+            <th>Result</th>
+            <th>Confidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for history in item.history %}
+          <tr>
+            <td>{{ history[0] }}</td>
+            <td>{{ history[1] }}</td>
+            <td>{{ (history[2] * 100)|round(2) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="meta">No analyze history saved for this user.</div>
+      {% endif %}
+    </section>
+    {% endfor %}
+  {% else %}
+  <div class="empty">No past users found.</div>
+  {% endif %}
+</main>
+</body>
+</html>

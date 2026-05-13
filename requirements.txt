@@ -1,0 +1,17 @@
+# Setup:
+# cd fake-news-detection
+# Add dataset files:
+# data\Fake.csv
+# data\True.csv
+# python -m venv .venv
+# .venv\Scripts\activate
+# pip install -r requirements.txt
+# python python_files\combine.py
+# python python_files\model.py
+# python python_files\db_setup.py
+# python python_files\app.py
+
+Flask==3.1.0
+requests==2.32.3
+pandas==2.2.3
+scikit-learn==1.6.1

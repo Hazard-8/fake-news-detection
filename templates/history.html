@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyser History</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <main class="container">
+        <div class="header">
+            <h1>Analyser History</h1>
+            <p class="subtitle">Saved results for your account</p>
+        </div>
+
+        {% if data %}
+            <div class="history-page-list">
+                {% for news, result, confidence in data %}
+                <article class="history-page-item">
+                    <h2>{{ result }}</h2>
+                    <p>{{ news }}</p>
+                    <small>Confidence: {{ (confidence * 100)|round(2) }}%</small>
+                </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="history-empty">No analyser history yet.</p>
+        {% endif %}
+
+        <a class="history-back-link" href="/">Back to analyser</a>
+    </main>
+</body>
+</html>

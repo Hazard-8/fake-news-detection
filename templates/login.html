@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fake News Detection Login</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(-45deg, #667eea, #764ba2, #6dd5ed, #2193b0);
+  background-size: 400% 400%;
+  animation: gradientBG 10s ease infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.login-container {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 12px;
+  width: 320px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  animation: fadeInUp 1s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.login-container h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 8px rgba(102,126,234,0.4);
+  outline: none;
+}
+
+input[type="submit"] {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.tip {
+  font-size: 12px;
+  margin-top: -5px;
+  margin-bottom: 5px;
+}
+
+.error { color: red; text-align: center; }
+.success { color: green; }
+
+.links {
+  text-align: center;
+  margin-top: 10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="login-container">
+  <h2>Fake News Detection System</h2>
+  <p class="subtitle">
+    Login to verify and analyze the authenticity of news
+  </p>
+
+  <!-- ✅ FIXED FORM -->
+
+  <form method="POST" action="/login" onsubmit="return validateForm()">
+
+<!-- Username -->
+<input type="text" id="username" name="username" placeholder="Username" onkeyup="checkUsername()" required>
+<div id="userTip" class="tip"></div>
+
+<!-- Password -->
+<div style="position:relative;">
+  <input type="password" id="password" name="password" placeholder="Password" onkeyup="checkPassword()" required>
+  <span onclick="togglePassword()"
+    style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:12px; color:#667eea;">
+    Show
+  </span>
+</div>
+<div id="passTip" class="tip"></div>
+
+<input type="submit" value="Login">
+
+  </form>
+
+  <!-- ✅ FLASK ERROR -->
+
+{% if error %} <div class="tip error">{{ error }}</div>
+{% endif %}
+
+  <div class="links">
+    <a href="/register">Sign Up</a> |
+    <a href="/admin/login">Admin Login</a>
+  </div>
+</div>
+
+<script>
+function togglePassword() {
+  let pass = document.getElementById("password");
+  pass.type = (pass.type === "password") ? "text" : "password";
+}
+
+function checkUsername() {
+  let user = document.getElementById("username").value;
+  let tip = document.getElementById("userTip");
+
+  if (user.length < 4) {
+    tip.innerHTML = "Username must be at least 4 characters";
+    tip.className = "tip error";
+  } else {
+    tip.innerHTML = "Looks good!";
+    tip.className = "tip success";
+  }
+}
+
+function checkPassword() {
+  let pass = document.getElementById("password").value;
+  let tip = document.getElementById("passTip");
+
+  if (pass.length < 6) {
+    tip.innerHTML = "Password must be at least 6 characters";
+    tip.className = "tip error";
+  } else {
+    tip.innerHTML = "Strong password ✔";
+    tip.className = "tip success";
+  }
+}
+
+function validateForm() {
+  let user = document.getElementById("username").value;
+  let pass = document.getElementById("password").value;
+
+  if (user.length < 4 || pass.length < 6) {
+    alert("Please fix the errors before submitting");
+    return false;
+  }
+  return true;
+}
+</script>
+
+</body>
+</html>
