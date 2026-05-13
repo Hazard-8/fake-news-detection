@@ -4,12 +4,15 @@ Fake News Detection System using Python, Flask, SQLite and Machine Learning.
 
 ## Introduction
 
-Fake News Detection is a machine learning based web application that analyzes news text and predicts whether it is real or fake. The project uses Natural Language Processing with TF-IDF vectorization and a Logistic Regression model for text classification. It also includes user authentication, analysis history, admin management, SQLite database support, and optional live news verification through an API.
 
-This project is built using Python, Flask, SQLite, HTML, CSS, JavaScript, Pandas, and Scikit-learn. Dataset files, trained model files, database files, and API keys are not included in this public repository for privacy, security, and storage reasons. Users can add their own dataset, train the model, create a fresh database, and run the application locally.
+Nowadays, fake news spreads rapidly through online platforms and social media. A normal user cannot always verify whether a news article is real or fake by manually reading and analyzing multiple sources, as it can be time-consuming and exhausting. To address this problem, this project presents a Fake News Detection System that uses machine learning to analyze news text and predict whether it is real or fake.
 
+This project uses Natural Language Processing with TF-IDF vectorization and a Logistic Regression model for text classification. It is built using Python, Flask, SQLite, HTML, CSS, JavaScript, Pandas, and Scikit-learn. The system also includes user authentication, analysis history, admin management, SQLite database support, and optional live news verification through an API.
+
+Dataset files, trained model files, database files, and API keys are not included in this public repository for privacy, security, and storage reasons. Users can add their own dataset, train the model, create a fresh database, and run the application locally.
 
 ## Setup
+
 
 Open PowerShell inside the project folder and run:
 
